@@ -294,10 +294,15 @@ static bool compare_ways(const way_desc_t* a, const way_desc_t* b)
  */
 void way_builder_t::fill_menu(tool_selector_t *tool_selector, const waytype_t wtyp, const systemtype_t styp, sint16 /*ok_sound*/)
 {
-	// check if scenario forbids this
 	const waytype_t rwtyp = wtyp!=track_wt  || styp!=type_tram  ? wtyp : tram_wt;
-	if (!welt->get_scenario()->is_tool_allowed(welt->get_active_player(), TOOL_BUILD_WAY | GENERAL_TOOL, rwtyp)) {
+	// check if scenario forbids this
+	bool blend = false;
+	scenario_t *scen = welt->get_scenario();
+	if (!scen->is_tool_allowed(welt->get_active_player(), TOOL_BUILD_WAY | GENERAL_TOOL, rwtyp)) {
 		return;
+	}
+	else if (!scen->is_tool_active(welt->get_active_player(), TOOL_BUILD_WAY | GENERAL_TOOL, rwtyp)) {
+		blend = true;
 	}
 
 	const uint16 time = welt->get_timeline_year_month();
@@ -316,7 +321,7 @@ void way_builder_t::fill_menu(tool_selector_t *tool_selector, const waytype_t wt
 
 	// now add sorted ways
 	for(way_desc_t const* const i : matching) {
-		tool_selector->add_tool_selector(i->get_builder());
+		tool_selector->add_tool_selector(i->get_builder(), blend);
 	}
 }
 

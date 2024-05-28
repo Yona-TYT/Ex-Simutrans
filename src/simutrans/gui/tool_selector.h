@@ -22,9 +22,10 @@ class tool_selector_t : public gui_frame_t
 {
 private:
 	struct tool_data_t {
-		tool_data_t(tool_t* t=NULL) : tool(t), selected(false) {}
+		tool_data_t(tool_t* t=NULL) : tool(t), selected(false), blend(false) {}
 		tool_t* tool; ///< pointer to associated tool
 		bool selected;    ///< store whether tool was active during last call to tool_selector_t::draw
+		bool blend;    /// Visual effect that darken tools
 	};
 	/// tool definitions
 	vector_tpl<tool_data_t> tools;
@@ -60,13 +61,16 @@ private:
 
 	bool allow_break;
 
+	// Mix transparency with the image
+	bool blend;
+
 public:
 	tool_selector_t(const char *title, const char *help_file, uint32 toolbar_id, bool allow_break=true );
 
 	/**
 	 * Add a new tool with values and tooltip text.
 	 */
-	void add_tool_selector(tool_t *tool_in);
+	void add_tool_selector(tool_t *tool_in, bool blend=false);
 
 	// purges toolbar
 	void reset_tools();

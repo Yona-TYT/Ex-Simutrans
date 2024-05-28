@@ -1161,15 +1161,22 @@ void toolbar_t::update(player_t *player)
 			if(  create  ) {
 				DBG_DEBUG( "toolbar_t::update()", "add tool %i (param=%s)", w->get_id(), w->get_default_param() );
 			}
+			// check if scenario forbids this
 			scenario_t *scen = welt->get_scenario();
-			if(  scen->is_scripted()  &&  !scen->is_tool_allowed(player, w->get_id(), w->get_waytype())) {
-				continue;
+			bool blend = false;
+			if(  scen->is_scripted()  ) {
+				if( !scen->is_tool_allowed(player, w->get_id(), w->get_waytype()) ) {
+					continue;
+				}
+				else if ( !scen->is_tool_active(player, w->get_id(), w->get_waytype()) ) {
+					blend = true;
+				}
 			}
 			if ( !check_tool_availability(w,  welt->get_timeline_year_month()) ) {
 				continue;
 			}
 			// now add it to the toolbar gui
-			tool_selector->add_tool_selector( w );
+			tool_selector->add_tool_selector( w, blend );
 		}
 	}
 

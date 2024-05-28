@@ -411,6 +411,13 @@ public:
 	bool is_tool_allowed(const player_t* player, uint16 tool_id, sint16 wt = invalid_wt);
 
 	/**
+	 * Visual effect to make the tool go dark.
+	 * Called for instance in karte_t::local_set_tool to change active tool or when filling toolbars.
+	 * @return true to show as active.
+	 */
+	bool is_tool_active(const player_t* player, uint16 tool_id, sint16 wt = invalid_wt);
+
+	/**
 	 * Checks if player can use the tool at this position.
 	 * @return NULL if allowed otherwise error message
 	 */

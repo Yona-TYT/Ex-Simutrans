@@ -729,8 +729,13 @@ bool roadsign_t::register_desc(roadsign_desc_t *desc)
 void roadsign_t::fill_menu(tool_selector_t *tool_selector, waytype_t wtyp, sint16 /*sound_ok*/)
 {
 	// check if scenario forbids this
-	if (!welt->get_scenario()->is_tool_allowed(welt->get_active_player(), TOOL_BUILD_ROADSIGN | GENERAL_TOOL, wtyp)) {
+	bool blend = false;
+	scenario_t *scen = welt->get_scenario();
+	if (!scen->is_tool_allowed(welt->get_active_player(), TOOL_BUILD_ROADSIGN | GENERAL_TOOL, wtyp)) {
 		return;
+	}
+	else if (!scen->is_tool_active(welt->get_active_player(), TOOL_BUILD_ROADSIGN | GENERAL_TOOL, wtyp)) {
+		blend = true;
 	}
 
 	const uint16 time = welt->get_timeline_year_month();
@@ -745,7 +750,7 @@ void roadsign_t::fill_menu(tool_selector_t *tool_selector, waytype_t wtyp, sint1
 		}
 	}
 	for(roadsign_desc_t const* const i : matching) {
-		tool_selector->add_tool_selector(i->get_builder());
+		tool_selector->add_tool_selector(i->get_builder(),blend);
 	}
 }
 

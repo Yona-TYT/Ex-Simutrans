@@ -305,10 +305,17 @@ void hausbauer_t::fill_menu(tool_selector_t* tool_selector, building_desc_t::bty
 		default:
 			break;
 	}
-	if(  toolnr > 0  &&  !welt->get_scenario()->is_tool_allowed(welt->get_active_player(), toolnr, wt)  ) {
-		return;
+	bool blend = false;
+	if(  toolnr > 0 ) {
+		// check if scenario forbids this
+		scenario_t *scen = welt->get_scenario();
+		if (!scen->is_tool_allowed(welt->get_active_player(), toolnr, wt)) {
+			return;
+		}
+		else if (!scen->is_tool_active(welt->get_active_player(), toolnr, wt)) {
+			blend = true;
+		}
 	}
-
 	const uint16 time = welt->get_timeline_year_month();
 	DBG_DEBUG("hausbauer_t::fill_menu()","maximum %i",station_building.get_count());
 
@@ -316,7 +323,7 @@ void hausbauer_t::fill_menu(tool_selector_t* tool_selector, building_desc_t::bty
 //		DBG_DEBUG("hausbauer_t::fill_menu()", "try to add %s (%p)", desc->get_name(), desc);
 		if(  desc->get_type()==btype  &&  desc->get_builder()  &&  (btype==building_desc_t::headquarters  ||  desc->get_extra()==(uint16)wt)  ) {
 			if(  desc->is_available(time)  ) {
-				tool_selector->add_tool_selector( desc->get_builder() );
+				tool_selector->add_tool_selector( desc->get_builder(), blend );
 			}
 		}
 	}

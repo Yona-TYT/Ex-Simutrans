@@ -41,15 +41,18 @@ tool_selector_t::tool_selector_t(const char* title, const char *help_file, uint3
  * Add a new tool with values and tooltip text.
  * tool_in must be created by new tool_t(copy_tool)!
  */
-void tool_selector_t::add_tool_selector(tool_t *tool_in)
+void tool_selector_t::add_tool_selector(tool_t *tool_in, bool is_blend)
 {
 	image_id tool_img = tool_in->get_icon(welt->get_active_player());
 	if(  tool_img == IMG_EMPTY  &&  tool_in!=tool_t::dummy  ) {
 		return;
 	}
+	// marked for darkening tools
+	tool_data_t data_tool = tool_in;
+	data_tool.blend = is_blend;
 
 	// only for non-empty icons ...
-	tools.append(tool_in);
+	tools.append(data_tool);
 
 	int ww = max(2,(display_get_width()/env_t::iconsize.w)-2); // to avoid zero or negative ww on posix (no graphic) backends
 	tool_icon_width = tools.get_count();
@@ -341,7 +344,12 @@ void tool_selector_t::draw(scr_coord pos, scr_size sz)
 		if(  icon_img != IMG_EMPTY  ) {
 			bool tool_dirty = dirty  ||  (tools[i].tool->is_selected() ^ tools[i].selected);
 			display_fit_img_to_width( icon_img, env_t::iconsize.w );
-			display_color_img(icon_img, draw_pos.x, draw_pos.y, player->get_player_nr(), false, tool_dirty);
+			if(tools[i].blend){
+				display_base_img_blend(icon_img, draw_pos.x, draw_pos.y, player->get_player_nr(), TRANSPARENT50_FLAG  | SYSCOL_IMAGE_TRANSPARENCY, false, tool_dirty);
+			}
+			else {
+				display_color_img(icon_img, draw_pos.x, draw_pos.y, player->get_player_nr(), false, tool_dirty);
+			}
 			tools[i].tool->draw_after( draw_pos, tool_dirty);
 			// store whether tool was selected
 			tools[i].selected = tools[i].tool->is_selected();
